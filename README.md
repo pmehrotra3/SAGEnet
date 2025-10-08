@@ -1,75 +1,77 @@
-CartPole CMA-ES Evolutionary RL
+# CartPole with SAGENet (Evolutionary RL)
 
-An evolutionary reinforcement-learning agent that learns to balance CartPole using CMA-ES.
+An evolutionary reinforcement-learning agent that learns to balance **CartPole** using **CMA-ES**.
 
-Developed with assistance from Claude (Anthropic), ChatGPT (OpenAI), and Gemini (Google).
+**Developed with assistance from Claude (Anthropic), ChatGPT (OpenAI), and Gemini (Google).**
 
-Quick Start
-1) Setup (one command)
+---
+
+## Quick Start
+
+### 1) Setup (one command)
+
+```bash
 chmod +x setup.sh
 ./setup.sh
+```
 
+> `setup.sh` does **everything** on Ubuntu/macOS: installs system deps (Redis, Eigen, hiredis, nlohmann-json, compiler), builds and installs `redis-plus-plus`, creates a Python venv, installs `requirements.txt`, and compiles the C++ agent (`./agent`).  
+> It may ask for **sudo** and (on macOS) install **Homebrew** if missing.
 
-setup.sh does everything on Ubuntu/macOS: installs system deps (Redis, Eigen, hiredis, nlohmann-json, compiler), builds and installs redis-plus-plus, creates a Python venv, installs requirements.txt, and compiles the C++ agent (./agent).
-It may ask for sudo and (on macOS) install Homebrew if missing.
+### 2) Run (open 3 terminals)
 
-2) Run (open 3 terminals)
-
-Terminal 1 – Redis
-
+**Terminal 1 – Redis**
+```bash
 redis-server
+```
 
-
-Terminal 2 – CartPole simulator (Python)
-
+**Terminal 2 – CartPole simulator (Python)**
+```bash
 source venv/bin/activate
 python Cartpole.py
+```
 
-
-Terminal 3 – Evolutionary agent (C++)
-
+**Terminal 3 – Evolutionary agent (C++)**
+```bash
 ./agent
+```
 
-Stop (order matters)
+### Stop (order matters)
 
-Ctrl+C in Terminal 3 (agent)
+- `Ctrl+C` in **Terminal 3** (agent)  
+- `Ctrl+C` in **Terminal 2** (Python)  
+- `Ctrl+C` in **Terminal 1** (Redis)
 
-Ctrl+C in Terminal 2 (Python)
+---
 
-Ctrl+C in Terminal 1 (Redis)
+## What It Does
 
-What It Does
+- Runs generations of CMA-ES evolution.  
+- Per generation: **sample 20** policies → **keep top 5** → update distribution.  
+- Live CartPole window shows balancing progress.  
+- Saves reward plot to `output/cartpole_rewards.png` every 100 episodes.  
+- **Typical convergence:** ~60–100 generations to reach reward 500 **in many runs with default settings** (*stochastic; not guaranteed*).
 
-Runs generations of CMA-ES evolution.
+---
 
-Per generation: sample 20 policies → keep top 5 → update distribution.
+## Requirements
 
-Live CartPole window shows balancing progress.
+- **OS:** Ubuntu 20.04+ or macOS  
+- **Python:** 3.8+  
+- **Compiler:** GCC 11+ (Ubuntu) or GCC 15 (macOS)  
+- **Redis:** `redis-server` in PATH  
 
-Saves reward plot to output/cartpole_rewards.png every 100 episodes.
+> All of the above are handled by `setup.sh` where possible.
 
-Typical convergence: ~60–100 generations to reach reward 500 in many runs with default settings (stochastic; not guaranteed).
+---
 
-Requirements
+## Project Layout
 
-OS: Ubuntu 20.04+ or macOS
-
-Python: 3.8+
-
-Compiler: GCC 11+ (Ubuntu) or GCC 15 (macOS)
-
-Redis: redis-server in PATH
-
-All of the above are handled by setup.sh where possible.
-
-Project Layout
+```
 .
 ├─ main.cpp            # C++ evolutionary agent (CMA-ES loop)
 ├─ Cartpole.py         # Python CartPole env + reward logging
 ├─ setup.sh            # One-shot setup (system deps + venv + build)
 ├─ requirements.txt    # Python deps
 └─ output/             # Generated plots and logs
-
-
-Thinking
-ChatGPT can make mistakes. Check important info.
+```
