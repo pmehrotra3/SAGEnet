@@ -1,128 +1,75 @@
-#!/usr/bin/env bash
-# setup.sh — one-shot installer for CartPole CMA-ES
-set -euo pipefail
+CartPole CMA-ES Evolutionary RL
 
-echo "🚀 CartPole CMA-ES Setup Script"
-echo "================================"
+An evolutionary reinforcement-learning agent that learns to balance CartPole using CMA-ES.
 
-# --- Helpers ---------------------------------------------------------------
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-CORES="$( (command -v nproc >/dev/null && nproc) || (sysctl -n hw.ncpu) )"
+Developed with assistance from Claude (Anthropic), ChatGPT (OpenAI), and Gemini (Google).
 
-have() { command -v "$1" >/dev/null 2>&1; }
+Quick Start
+1) Setup (one command)
+chmod +x setup.sh
+./setup.sh
 
-# --- OS detect -------------------------------------------------------------
-OS="unknown"
-case "${OSTYPE:-}" in
-  linux-gnu*) OS="ubuntu" ; echo "📦 Detected: Ubuntu/Linux" ;;
-  darwin*)    OS="macos"  ; echo "📦 Detected: macOS" ;;
-  *)          echo "❌ Unsupported OS: ${OSTYPE:-unknown}" ; exit 1 ;;
-esac
 
-# --- System deps -----------------------------------------------------------
-echo ""
-echo "📥 Installing system dependencies..."
-if [[ "$OS" == "ubuntu" ]]; then
-  sudo apt-get update -y
-  sudo apt-get install -y \
-    build-essential cmake git redis-server \
-    libeigen3-dev nlohmann-json3-dev libhiredis-dev \
-    python3 python3-pip python3-venv pkg-config
-elif [[ "$OS" == "macos" ]]; then
-  if ! have brew; then
-    echo "🍺 Installing Homebrew..."
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    eval "$(/opt/homebrew/bin/brew shellenv)" || true
-  fi
-  brew update
-  brew install redis eigen nlohmann-json hiredis cmake python pkg-config
-  # Prefer GCC 15 if available (Apple Clang is usually fine too)
-  brew list gcc@15 >/dev/null 2>&1 && export CXX=g++-15 || true
-fi
+setup.sh does everything on Ubuntu/macOS: installs system deps (Redis, Eigen, hiredis, nlohmann-json, compiler), builds and installs redis-plus-plus, creates a Python venv, installs requirements.txt, and compiles the C++ agent (./agent).
+It may ask for sudo and (on macOS) install Homebrew if missing.
 
-# --- redis-plus-plus (skip if present) -------------------------------------
-echo ""
-echo "🧩 Checking for redis-plus-plus (sw::redis)..."
-if pkg-config --exists redis++; then
-  echo "✅ redis-plus-plus already installed (pkg-config: redis+)."
-else
-  echo "📦 Installing redis-plus-plus from source..."
-  TMPDIR="$(mktemp -d)"
-  pushd "$TMPDIR" >/dev/null
-  git clone --depth 1 https://github.com/sewenew/redis-plus-plus.git
-  cd redis-plus-plus
-  mkdir -p build && cd build
+2) Run (open 3 terminals)
 
-  CMAKE_ARGS=(-DCMAKE_BUILD_TYPE=Release -DREDIS_PLUS_PLUS_CXX_STANDARD=17)
-  if [[ "$OS" == "macos" ]]; then
-    # Use Homebrew prefix for includes/libs
-    HB_PREFIX="$(brew --prefix)"
-    CMAKE_ARGS+=(
-      "-DCMAKE_PREFIX_PATH=${HB_PREFIX}"
-      "-DCMAKE_INSTALL_PREFIX=${HB_PREFIX}"
-    )
-    # Prefer GCC 15 if available
-    if have g++-15; then CMAKE_ARGS+=(-DCMAKE_CXX_COMPILER=g++-15); fi
-  fi
+Terminal 1 – Redis
 
-  cmake "${CMAKE_ARGS[@]}" ..
-  make -j"${CORES}"
-  sudo make install
-  [[ "$OS" == "ubuntu" ]] && sudo ldconfig || true
-  popd >/dev/null
-  rm -rf "$TMPDIR"
-  echo "✅ redis-plus-plus installed."
-fi
+redis-server
 
-# --- Project setup ---------------------------------------------------------
-echo ""
-echo "📦 Setting up project (venv, Python deps, build)..."
-cd "$SCRIPT_DIR"
 
-# Python venv
-if [[ ! -d venv ]]; then
-  python3 -m venv venv
-fi
-# shellcheck disable=SC1091
+Terminal 2 – CartPole simulator (Python)
+
 source venv/bin/activate
-python -m pip install --upgrade pip wheel setuptools
+python Cartpole.py
 
-if [[ -f requirements.txt ]]; then
-  pip install -r requirements.txt
-else
-  echo "⚠️ requirements.txt not found; installing minimal deps."
-  pip install numpy matplotlib gymnasium pygame
-fi
 
-# Build agent
-echo ""
-echo "🔨 Compiling agent..."
-if [[ -x ./compile.sh ]]; then
-  chmod +x ./compile.sh
-  ./compile.sh
-else
-  # Fallback single-file build (adjust if your project needs more files/flags)
-  CXX_BIN="${CXX:-g++}"
-  "$CXX_BIN" -O3 -std=c++17 -Wall -Wextra -march=native \
-    -o agent main.cpp \
-    $(pkg-config --cflags --libs redis++) || {
-      echo "❌ Failed to build with pkg-config redis++; check include/library paths."
-      exit 1
-    }
-fi
+Terminal 3 – Evolutionary agent (C++)
 
-# Output dir
-mkdir -p output
+./agent
 
-# --- Final notes -----------------------------------------------------------
-echo ""
-echo "✅ Setup complete!"
-echo ""
-echo "To run the system, open 3 terminals:"
-echo "  1) redis-server"
-echo "  2) source venv/bin/activate && python Cartpole.py"
-echo "  3) ./agent"
-echo ""
-echo "Tips:"
-echo "  • If macOS can’t find redis libs at runtime, try: export DYLD_LIBRARY_PATH=\"\$(brew --prefix)/lib:\$DYLD_LIBRARY_PATH\""
-echo "  • On Ubuntu, if redis isn’t running: sudo systemctl start redis-server"
+Stop (order matters)
+
+Ctrl+C in Terminal 3 (agent)
+
+Ctrl+C in Terminal 2 (Python)
+
+Ctrl+C in Terminal 1 (Redis)
+
+What It Does
+
+Runs generations of CMA-ES evolution.
+
+Per generation: sample 20 policies → keep top 5 → update distribution.
+
+Live CartPole window shows balancing progress.
+
+Saves reward plot to output/cartpole_rewards.png every 100 episodes.
+
+Typical convergence: ~60–100 generations to reach reward 500 in many runs with default settings (stochastic; not guaranteed).
+
+Requirements
+
+OS: Ubuntu 20.04+ or macOS
+
+Python: 3.8+
+
+Compiler: GCC 11+ (Ubuntu) or GCC 15 (macOS)
+
+Redis: redis-server in PATH
+
+All of the above are handled by setup.sh where possible.
+
+Project Layout
+.
+├─ main.cpp            # C++ evolutionary agent (CMA-ES loop)
+├─ Cartpole.py         # Python CartPole env + reward logging
+├─ setup.sh            # One-shot setup (system deps + venv + build)
+├─ requirements.txt    # Python deps
+└─ output/             # Generated plots and logs
+
+
+Thinking
+ChatGPT can make mistakes. Check important info.
