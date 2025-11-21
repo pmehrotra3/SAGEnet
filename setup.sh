@@ -1,128 +1,133 @@
 #!/usr/bin/env bash
-# setup.sh — one-shot installer for CartPole CMA-ES
+# setup.sh — one-shot installer for SAGEnet + CMA_agent on Ubuntu
 set -euo pipefail
 
-echo "🚀 CartPole CMA-ES Setup Script"
-echo "================================"
+echo "🚀 SAGEnet CMA-ES Setup (Ubuntu from bare system)"
+echo "================================================="
 
-# --- Helpers ---------------------------------------------------------------
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-CORES="$( (command -v nproc >/dev/null && nproc) || (sysctl -n hw.ncpu) )"
+cd "$SCRIPT_DIR"
 
 have() { command -v "$1" >/dev/null 2>&1; }
 
-# --- OS detect -------------------------------------------------------------
-OS="unknown"
-case "${OSTYPE:-}" in
-  linux-gnu*) OS="ubuntu" ; echo "📦 Detected: Ubuntu/Linux" ;;
-  darwin*)    OS="macos"  ; echo "📦 Detected: macOS" ;;
-  *)          echo "❌ Unsupported OS: ${OSTYPE:-unknown}" ; exit 1 ;;
-esac
-
-# --- System deps -----------------------------------------------------------
-echo ""
-echo "📥 Installing system dependencies..."
-if [[ "$OS" == "ubuntu" ]]; then
-  sudo apt-get update -y
-  sudo apt-get install -y \
-    build-essential cmake git redis-server \
-    libeigen3-dev nlohmann-json3-dev libhiredis-dev \
-    python3 python3-pip python3-venv pkg-config
-elif [[ "$OS" == "macos" ]]; then
-  if ! have brew; then
-    echo "🍺 Installing Homebrew..."
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    eval "$(/opt/homebrew/bin/brew shellenv)" || true
-  fi
-  brew update
-  brew install redis eigen nlohmann-json hiredis cmake python pkg-config
-  # Prefer GCC 15 if available (Apple Clang is usually fine too)
-  brew list gcc@15 >/dev/null 2>&1 && export CXX=g++-15 || true
+# --- Sanity check: apt-based Ubuntu ----------------------------------------
+if ! have apt-get; then
+  echo "❌ This script assumes an apt-based Ubuntu/Debian system."
+  echo "   'apt-get' not found. Aborting."
+  exit 1
 fi
 
-# --- redis-plus-plus (skip if present) -------------------------------------
+echo "📦 Detected apt-based system. Installing system dependencies with sudo..."
+
+sudo apt-get update -y
+sudo apt-get install -y \
+  build-essential \
+  git \
+  curl \
+  cmake \
+  pkg-config \
+  python3 \
+  python3-venv \
+  python3-pip \
+  redis-server \
+  libeigen3-dev \
+  nlohmann-json3-dev \
+  libhiredis-dev
+
+# --- redis-plus-plus (sw::redis) via source if needed ----------------------
 echo ""
-echo "🧩 Checking for redis-plus-plus (sw::redis)..."
+echo "🧩 Checking for redis-plus-plus (pkg-config name: redis++)..."
 if pkg-config --exists redis++; then
-  echo "✅ redis-plus-plus already installed (pkg-config: redis+)."
+  echo "✅ redis-plus-plus already available (pkg-config redis++)."
 else
-  echo "📦 Installing redis-plus-plus from source..."
+  echo "📥 redis-plus-plus not found. Installing from source..."
+
   TMPDIR="$(mktemp -d)"
   pushd "$TMPDIR" >/dev/null
+
   git clone --depth 1 https://github.com/sewenew/redis-plus-plus.git
   cd redis-plus-plus
   mkdir -p build && cd build
 
-  CMAKE_ARGS=(-DCMAKE_BUILD_TYPE=Release -DREDIS_PLUS_PLUS_CXX_STANDARD=17)
-  if [[ "$OS" == "macos" ]]; then
-    # Use Homebrew prefix for includes/libs
-    HB_PREFIX="$(brew --prefix)"
-    CMAKE_ARGS+=(
-      "-DCMAKE_PREFIX_PATH=${HB_PREFIX}"
-      "-DCMAKE_INSTALL_PREFIX=${HB_PREFIX}"
-    )
-    # Prefer GCC 15 if available
-    if have g++-15; then CMAKE_ARGS+=(-DCMAKE_CXX_COMPILER=g++-15); fi
-  fi
-
-  cmake "${CMAKE_ARGS[@]}" ..
-  make -j"${CORES}"
+  cmake -DCMAKE_BUILD_TYPE=Release -DREDIS_PLUS_PLUS_CXX_STANDARD=17 ..
+  make -j"$(nproc)"
   sudo make install
-  [[ "$OS" == "ubuntu" ]] && sudo ldconfig || true
+  sudo ldconfig
+
   popd >/dev/null
   rm -rf "$TMPDIR"
+
   echo "✅ redis-plus-plus installed."
 fi
 
-# --- Project setup ---------------------------------------------------------
+# --- Python venv + requirements --------------------------------------------
 echo ""
-echo "📦 Setting up project (venv, Python deps, build)..."
-cd "$SCRIPT_DIR"
+echo "🐍 Setting up Python virtual environment..."
 
-# Python venv
 if [[ ! -d venv ]]; then
   python3 -m venv venv
 fi
+
 # shellcheck disable=SC1091
 source venv/bin/activate
+
 python -m pip install --upgrade pip wheel setuptools
 
 if [[ -f requirements.txt ]]; then
+  echo "📥 Installing Python requirements from requirements.txt..."
   pip install -r requirements.txt
 else
   echo "⚠️ requirements.txt not found; installing minimal deps."
-  pip install numpy matplotlib gymnasium pygame
+  pip install numpy matplotlib gymnasium redis
 fi
 
-# Build agent
+# --- Compile CMA_agent ------------------------------------------------------
 echo ""
-echo "🔨 Compiling agent..."
-if [[ -x ./compile.sh ]]; then
-  chmod +x ./compile.sh
-  ./compile.sh
-else
-  # Fallback single-file build (adjust if your project needs more files/flags)
-  CXX_BIN="${CXX:-g++}"
-  "$CXX_BIN" -O3 -std=c++17 -Wall -Wextra -march=native \
-    -o agent main.cpp \
-    $(pkg-config --cflags --libs redis++) || {
-      echo "❌ Failed to build with pkg-config redis++; check include/library paths."
-      exit 1
-    }
+echo "🔨 Compiling CMA_agent..."
+
+# Prefer g++-15 if user installed it; otherwise use default g++
+CXX_BIN="g++-15"
+if ! have "$CXX_BIN"; then
+  CXX_BIN="g++"
 fi
 
-# Output dir
+echo "👉 Using C++ compiler: $CXX_BIN"
+
+# Make sure CMA_agent.cpp exists
+if [[ ! -f CMA_agent.cpp ]]; then
+  echo "❌ CMA_agent.cpp not found in $SCRIPT_DIR"
+  exit 1
+fi
+
+# Compile with your flags
+set -x
+"$CXX_BIN" -std=c++17 -O3 -fopenmp CMA_agent.cpp -o CMA_agent \
+  $(pkg-config --cflags --libs redis++) \
+  -Ieigen -Ijson -pthread
+set +x
+
+echo ""
+echo "✅ CMA_agent compiled successfully."
+
 mkdir -p output
 
-# --- Final notes -----------------------------------------------------------
+# --- Final instructions -----------------------------------------------------
 echo ""
 echo "✅ Setup complete!"
 echo ""
-echo "To run the system, open 3 terminals:"
-echo "  1) redis-server"
-echo "  2) source venv/bin/activate && python Cartpole.py"
-echo "  3) ./agent"
+echo "To run the full system (example: CartPole with CMA-agent) on this Ubuntu machine:"
 echo ""
-echo "Tips:"
-echo "  • If macOS can’t find redis libs at runtime, try: export DYLD_LIBRARY_PATH=\"\$(brew --prefix)/lib:\$DYLD_LIBRARY_PATH\""
-echo "  • On Ubuntu, if redis isn’t running: sudo systemctl start redis-server"
+echo "  1) Start Redis (if not already running):"
+echo "       sudo service redis-server start"
+echo ""
+echo "  2) In one terminal, activate venv and run the simulator:"
+echo "       cd \"$SCRIPT_DIR\""
+echo "       source venv/bin/activate"
+echo "       python simulator.py CartPole-v1 --agent cma-block"
+echo ""
+echo "  3) In another terminal, run the CMA agent binary:"
+echo "       cd \"$SCRIPT_DIR\""
+echo "       ./CMA_agent CartPole-v1 --total_timesteps 100000"
+echo ""
+echo "Graphs will be written under: output/cma-block/"
+
