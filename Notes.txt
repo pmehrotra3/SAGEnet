@@ -1,0 +1,110 @@
+model = A2C(
+    policy="MlpPolicy",
+    env=env,
+    verbose=1
+)
+
+
+A2C(...)
+
+You are creating an Advantage Actor–Critic reinforcement learning agent.
+
+Actor → chooses actions
+
+Critic → estimates how good states are
+
+Advantage → stabilizes learning by comparing action value vs baseline
+
+policy="MlpPolicy"
+
+This tells Stable-Baselines3 how the neural network looks.
+
+"MlpPolicy" = fully connected neural network
+
+Works for:
+
+Vector observations (Box(n,))
+
+Discrete or continuous actions
+
+Internally:
+
+Actor network + Critic network
+
+Shared feature extractor by default
+
+In short: “Use a simple feed-forward neural network.”
+
+env=env
+
+This attaches your Gymnasium environment to the agent.
+
+The agent will:
+
+Call env.reset()
+
+Call env.step(action)
+
+In your case:
+
+This env is your simulator loop
+
+Learning happens online, step-by-step
+
+verbose=1
+
+Controls logging output:
+
+0 → silent
+
+1 → progress info (timesteps, losses)
+
+2 → very detailed debug info
+
+You picked the correct level for development.
+
+
+
+
+# This wrapper makes SB3 track episode stats internally
+    env = gym.wrappers.RecordEpisodeStatistics(env)
+
+    This wrapper keeps track of episode returns and lengths automatically, without you writing your own counters.
+
+WHAT DOE STHIS DO  # -------------------------
+    # Read episode stats from SB3
+    # model.ep_info_buffer contains dicts like {"r": return, "l": length}
+    # -------------------------
+    
+    
+    ep_infos = list(model.ep_info_buffer)
+    episode_returns = [float(x["r"]) for x in ep_infos]
+    episode_lengths = [int(x["l"]) for x in ep_infos]
+
+and wat doe tshis od 
+
+
+Stable-Baselines3 automatically looks for:
+
+info["episode"]
+
+2️⃣ How SB3 uses this information
+
+Stable-Baselines3 automatically looks for:
+
+info["episode"]
+
+
+If it exists, SB3 stores it in an internal buffer.
+
+That buffer is:
+
+model.ep_info_buffer
+
+3️⃣ What is model.ep_info_buffer?
+model.ep_info_buffer
+
+
+This is a deque (queue) that stores recent episode summaries.
+
+Each entry is a dictionary like:

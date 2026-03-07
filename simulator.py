@@ -10,9 +10,12 @@ import json
 import numpy as np
 import os
 import matplotlib.pyplot as plt
-import argparse  # Import argparse to read command-line arguments
+import argparse  
+import csv
+
 
 # --- Setup Command-Line Argument Parsing ---
+
 
 parser = argparse.ArgumentParser(description="Run a Gymnasium environment server with Redis.")
 
@@ -36,99 +39,100 @@ parser.add_argument(
     help="Agent type controlling this simulator: PPO, A2C, SAC, DQN, diag-cma, or cma-block."
 )
 
+parser.add_argument(
+    "--total-timesteps",
+    type=int,
+    default=100_000,
+    help="Stop the simulator after this many timesteps."
+)
+
 
 args = parser.parse_args()
 
+
+# --- Access attributes ---
+
+
 ENV_NAME = args.env_name
-
 RENDER_MODE = "human" if args.render else None  # Set render_mode to "human" only if --render is used
-
 AGENT_TYPE = args.agent 
+TOTAL_TIMESTEPS = args.total_timesteps
+
 
 
 # --- Connect to Redis ---
 
-# Redis acts as a message broker between this environment simulator and an external agent
 
+# Redis acts as a message broker between this environment simulator and an external agent
 try:
     
-     # Create a Redis connection to localhost on default port 6379, database 0
-     
+    # Create a Redis connection to localhost on default port 6379, database 0
     r = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
     
     # Test the connection by sending a ping command
-    
     r.ping()
     
-    print("✅ Successfully connected to Redis.")
+    print("Successfully connected to Redis.")
     
 except redis.exceptions.ConnectionError as e:
     
-    print(f"❌ Could not connect to Redis: {e}")
-    
+    print(f"ERROR: Could not connect to Redis: {e}")
     exit()
 
+
 # --- Key names for Redis Lists ---
+
 
 # Define the Redis list keys dynamically based on the environment name
 
 STATE_KEY = f'{ENV_NAME}:state' # Queue for sending environment states to the agent
-
 ACTION_KEY = f'{ENV_NAME}:action'  #Queue for receiving actions from the agent
-
 EXPERIENCE_KEY = f'{ENV_NAME}:experience' # Queue for storing experience tuples
 
 # Clear any old data from previous runs to start fresh
 
 r.delete(STATE_KEY, ACTION_KEY, EXPERIENCE_KEY)
+print(f"Cleared old keys from Redis for '{ENV_NAME}'.")
 
-print(f"🧹 Cleared old keys from Redis for '{ENV_NAME}'.")
 
 # --- Set up the Gymnasium Environment ---
 
-# Create the environment dynamically using the provided name and render mode
 
+# Create the environment dynamically using the provided name and render mode
 try:
+    
     env = gym.make(ENV_NAME, render_mode=RENDER_MODE)
-    
-    print(f"🤖  Gymnasium environment '{ENV_NAME}' created.")
-    
+    print(f"Gymnasium environment '{ENV_NAME}' created.")
     print(f"   - Action Space: {env.action_space}")
-    
     print(f"   - Observation Space: {env.observation_space}")
     
 except Exception as e:
     
-    print(f"❌ Failed to create environment '{ENV_NAME}': {e}")
-    
+    print(f"ERROR: Failed to create environment '{ENV_NAME}': {e}")
     exit()
 
+
 # --- Training Loop ---
+
 # Simulator runs infinitely, serving timesteps to the agent
 # Agent can train after each timestep
 
-print(f"▶️ Simulator ready. Serving timesteps for '{ENV_NAME}'...")
+print(f"Simulator ready. Serving timesteps for '{ENV_NAME}'...")
 
-# Track episode returns and when they occurred
-episode_returns = []      # Total return for each episode
-episode_timesteps = []    # Timestep at which each episode ended
-
-total_timesteps = 0       # Global timestep counter
-current_episode_return = 0  # Accumulator for current episode return
+episode_returns = []       # List of total reward per episode (one number per episode)
+episode_timesteps = []     # A list that records when (at which global timestep) each episode ended.
+total_timesteps = 0         # A global counter of how many environment steps have been taken across all episodes.
+current_episode_return = 0  # A running total of rewards within the current episode only.
 
 # Initialize the environment once at the start
-
 state, info = env.reset()
-
 r.lpush(STATE_KEY, json.dumps(state.tolist()))
+print(f"Initial state sent.")
 
-print(f"👍 Initial state sent.")
-
-while True:
+while total_timesteps < TOTAL_TIMESTEPS:
     
-    total_timesteps += 1  # Increment global timestep counter
-    
-    print(f"⏳ SIM (Timestep {total_timesteps}): Waiting for action from agent...")
+    total_timesteps += 1  
+    print(f"SIM (Timestep {total_timesteps}): Waiting for action from agent...")
     
     # Block and wait until an action is available from the agent
     # brpop removes and returns item from the right side of the list (FIFO queue)
@@ -139,7 +143,7 @@ while True:
     
     action = json.loads(action_json)
     
-    print(f"✅ (Timestep {total_timesteps}): Received action '{action}'.")
+    print(f"(Timestep {total_timesteps}): Received action '{action}'.")
     
     # Execute the action in the environment
     # Returns: next_state, reward, terminated, truncated, info
@@ -168,15 +172,13 @@ while True:
         'action': action_serializable,
         'reward': float(reward),
         'next_state': next_state.tolist(), 
-        'terminated': bool(done)
+        'done': bool(done)
     }
     
     # Store the experience in Redis for the agent to use for learning
-    
     r.lpush(EXPERIENCE_KEY, json.dumps(experience))
     
     # Update the current state for the next iteration
-    
     state = next_state
 
     # If the episode is over, reset the environment
@@ -185,7 +187,7 @@ while True:
         episode_returns.append(current_episode_return)
         episode_timesteps.append(total_timesteps)
         
-        print(f"📊 Timestep {total_timesteps} | Episode ended | Episode Return: {current_episode_return}")
+        print(f"Timestep {total_timesteps} | Episode ended | Episode Return: {current_episode_return}")
         
         current_episode_return = 0  # Reset episode return counter
         state, info = env.reset()
@@ -193,57 +195,83 @@ while True:
     # Push the next state to the agent (whether episode ended or not)
     r.lpush(STATE_KEY, json.dumps(state.tolist()))
     
-    # Every 10,000 timesteps, generate and save the reward graph
+# Close the environment when done
+env.close() 
     
-    if total_timesteps % 10000 == 0:
-        
-        print("📈 Generating reward graph...")
-        
-        plt.figure(figsize=(12, 6))
-        
-        # Plot episode returns at the timesteps they occurred (scatter points)
-        plt.scatter(episode_timesteps, episode_returns, alpha=0.3, s=10, color='blue', label='Episode Return')
-        
-        # Calculate and plot moving average of episode returns
-        moving_avg_window = 100  # Average over last 100 episodes
-        
-        if len(episode_returns) >= moving_avg_window:
+    
+# --- After training is done: generate reward graph and save performance table ---
+
+# Create output directory if it doesn't exist to store plots
+base_output_dir = 'output'
+output_dir = os.path.join(base_output_dir, AGENT_TYPE)
+os.makedirs(output_dir, exist_ok=True)
+
+print("Generating reward graph...")
+plt.figure(figsize=(12, 6))
             
-            moving_avg = np.convolve(episode_returns, 
-                                    np.ones(moving_avg_window)/moving_avg_window, 
-                                    mode='valid')
+# Plot episode returns at the timesteps they occurred (scatter points)
+plt.scatter(episode_timesteps, episode_returns, alpha=0.3, s=10, color='blue', label='Episode Return')
+        
+# Calculate and plot moving average of episode returns
+moving_avg_window = 100  # Average over last 100 episodes
+
+# Plot a smoothed learning curve using a moving average over episodes.
+if len(episode_returns) >= moving_avg_window:
             
-            # Get corresponding timesteps for the moving average
-            avg_timesteps = episode_timesteps[moving_avg_window-1:]
+    moving_avg = np.convolve(episode_returns, 
+                            np.ones(moving_avg_window)/moving_avg_window, 
+                            mode='valid')
             
-            plt.plot(avg_timesteps, moving_avg, 
-                    color='red', linewidth=2, 
-                    label=f'{moving_avg_window}-Episode Moving Average')
+    # Get corresponding timesteps for the moving average
+    avg_timesteps = episode_timesteps[moving_avg_window-1:]
+            
+    plt.plot(avg_timesteps, moving_avg, 
+            color='red', linewidth=2, 
+            label=f'{moving_avg_window}-Episode Moving Average')
+    
+plt.xlabel('Timesteps')
+plt.ylabel('Episode Return')
+    
+# Use the environment name in the title
+plt.title(f'{ENV_NAME} Training Progress: Episode Returns vs Timesteps')
+plt.legend()
+plt.grid(True, alpha=0.3)
+    
+# Save plot
+output_path = os.path.join(output_dir, f'{ENV_NAME}_returns_timesteps.png')
+plt.savefig(output_path, dpi=300, bbox_inches='tight')
+plt.close()
         
-        plt.xlabel('Timesteps')
+print(f"Reward graph updated at '{output_path}' (Total Timesteps: {total_timesteps})")
+    
         
-        plt.ylabel('Episode Return')
         
-        # Use the environment name in the title
-        
-        plt.title(f'{ENV_NAME} Training Progress: Episode Returns vs Timesteps')
-        
-        plt.legend()
-        
-        plt.grid(True, alpha=0.3)
-        
-        # Group plots by agent type, e.g. output/PPO/CartPole-v1_returns.png
-        
-        base_output_dir = 'output'
-        
-        output_dir = os.path.join(base_output_dir, AGENT_TYPE)
-        
-        os.makedirs(output_dir, exist_ok=True)
-        
-        output_path = os.path.join(output_dir, f'{ENV_NAME}_returns_timesteps.png')
-        
-        plt.savefig(output_path, dpi=300, bbox_inches='tight')
-        
-        plt.close()
-        
-        print(f"✅ Reward graph updated at '{output_path}' (Total Timesteps: {total_timesteps})")
+# --- Save a performance table row (CSV) ---
+
+
+K = moving_avg_window  # last-K episodes summary
+last_k = episode_returns[-K:] if len(episode_returns) >= K else episode_returns
+
+if len(last_k) > 0:
+    final_mean = float(np.mean(last_k))
+    final_std = float(np.std(last_k))
+else:
+    final_mean, final_std = float("nan"), float("nan")
+
+table_path = os.path.join(output_dir, "final_performance.csv")
+file_exists = os.path.exists(table_path)
+
+with open(table_path, "a", newline="") as f:
+    writer = csv.writer(f)
+    if not file_exists:
+        writer.writerow([
+            "env_name", "agent", "total_timesteps",
+            "episodes_completed", f"mean_last_{K}", f"std_last_{K}"
+        ])
+    writer.writerow([
+        ENV_NAME, AGENT_TYPE, total_timesteps,
+        len(episode_returns), final_mean, final_std
+    ])
+
+print(f"Performance table updated at '{table_path}'")
+

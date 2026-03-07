@@ -7,7 +7,6 @@ import json
 import redis
 import numpy as np
 import gymnasium as gym
-
 from stable_baselines3 import A2C
 
 
@@ -44,11 +43,12 @@ class RedisEnv(gym.Env):
             db=redis_db,
             decode_responses=True,
         )
+        
         try:
             self.r.ping()
-            print("✅ A2C Agent: Connected to Redis.")
+            print("SUCCESS; A2C Agent: Connected to Redis.")
         except redis.exceptions.ConnectionError as e:
-            raise RuntimeError(f"❌ A2C Agent: Could not connect to Redis: {e}")
+            raise RuntimeError(f"ERROR; A2C Agent: Could not connect to Redis: {e}")
 
         # Get spaces from a local env
         tmp_env = gym.make(env_name)

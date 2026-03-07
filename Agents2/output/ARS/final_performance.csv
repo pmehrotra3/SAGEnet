@@ -1,0 +1,6 @@
+env_name,total_timesteps,episodes_completed,mean_last_100,std_last_100
+HalfCheetah-v4,1000000,0,nan,nan
+Walker2d-v4,1000000,0,nan,nan
+BipedalWalkerHardcore-v3,1000000,0,nan,nan
+Ant-v4,1000000,0,nan,nan
+Humanoid-v4,1000000,0,nan,nan
