@@ -1,2 +1,0 @@
-env_name,total_timesteps,episodes_completed,mean_last_100,std_last_100,sigma,hidden_layers,seed,n_eval_episodes,deterministic_eval
-HalfCheetah-v4,2000000,2000,-168.5951850226447,244.46245885960033,0.35,64-64,0,1,1
