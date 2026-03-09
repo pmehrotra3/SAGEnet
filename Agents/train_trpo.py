@@ -25,7 +25,7 @@ class EpisodeLoggerCallback(BaseCallback):
     then writes episode_log.csv and system_log.csv to out_dir at training end.
     """
 
-    def __init__(self, out_dir: str):
+    def __init__(self, out_dir: str, run: int):
         super().__init__()  # initialises self.model, self.num_timesteps, self.locals
 
         # Within-episode accumulators — reset to zero after every episode end.
@@ -48,6 +48,7 @@ class EpisodeLoggerCallback(BaseCallback):
         self.process    = None  # psutil handle for this process
 
         self.out_dir: str = out_dir  # directory where CSV files will be saved
+        self.run: int = run          # run number used for output filename (e.g. run 1 → episode_log_run_1.csv)
 
     def _on_training_start(self) -> None:
         """Record start times and initialise the psutil process handle."""
@@ -89,7 +90,7 @@ class EpisodeLoggerCallback(BaseCallback):
         """Write all accumulated data to episode_log.csv and system_log.csv."""
 
         # --- episode_log.csv ---
-        episode_csv = os.path.join(self.out_dir, "episode_log.csv")
+        episode_csv = os.path.join(self.out_dir, f"episode_log_run_{self.run}.csv")
         with open(episode_csv, "w", newline="") as f:  # newline="" prevents double line-endings on Windows
             writer = csv.writer(f)
             writer.writerow(["episode", "timestep", "reward", "length"])
@@ -99,7 +100,7 @@ class EpisodeLoggerCallback(BaseCallback):
                 writer.writerow([i + 1, timestep, ret, length])
 
         # --- system_log.csv ---
-        system_csv = os.path.join(self.out_dir, "system_log.csv")
+        system_csv  = os.path.join(self.out_dir, f"system_log_run_{self.run}.csv")
         with open(system_csv, "w", newline="") as f:
             writer = csv.writer(f)
             writer.writerow(["episode", "wall_time_s", "cpu_time_s", "ram_mb", "cpu_pct"])
@@ -121,6 +122,7 @@ def main():
     parser.add_argument("env_name",          type=str,             help="Gymnasium env ID, e.g. CartPole-v1")
     parser.add_argument("--total-timesteps", type=int, default=100_000, help="Total env steps to train for")
     parser.add_argument("--render",          action="store_true",  help="Render the environment during training")
+    parser.add_argument("--num-runs",        type=int, default=1,  help="Number of runs to average over (default: 1)")
     args = parser.parse_args()
 
     # --- environment ---
@@ -131,17 +133,18 @@ def main():
     out_dir = os.path.join("..", "output", args.env_name, "TRPO")
     os.makedirs(out_dir, exist_ok=True)  # creates full path, no error if already exists
 
-    # --- model ---
-    model = TRPO(
-        policy="MlpPolicy",  # standard feedforward network for vector observations
-        env=env,
-        verbose=0,           # silence SB3's own built-in output
-    )
-
-    # --- train ---
-    logger = EpisodeLoggerCallback(out_dir)
+    # --- create model and train ---
     print("Training started ...")
-    model.learn(total_timesteps=args.total_timesteps, callback=logger)
+    
+    for run in range(1, args.num_runs + 1):
+        print(f"Run {run}/{args.num_runs} ...")
+        model = TRPO(policy="MlpPolicy",  # standard feedforward network for vector observations
+                    env=env,
+                    verbose=0,           # silence SB3's own built-in output
+                    )
+        logger = EpisodeLoggerCallback(out_dir, run)
+        model.learn(total_timesteps=args.total_timesteps, callback=logger)
+        
     env.close()
     print("Training complete!")
 
