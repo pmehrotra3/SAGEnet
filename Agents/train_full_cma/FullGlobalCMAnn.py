@@ -12,7 +12,7 @@ from BaseCallback import BaseCallback
 
 
 HIDDEN_LAYERS = (64, 64)  # Fixed architecture — matches SB3 MlpPolicy defaults for fair comparison.
-SIGMA = 0.5               # CMA-ES initial step size — pycma default
+SIGMA = 0.05              # CMA-ES initial step size — pycma default
 
 
 # =============================================================================
@@ -39,10 +39,7 @@ class FullGlobalCMAnn:
         opts = {
             "CMA_diagonal": 0,    # full covariance matrix — no diagonal approximation
             "verbose":      -9,   # silence pycma console output
-            "CMA_cmean":    1,    # learning rate for the mean value
-            "CMA_rankmu":   1.0,  # multiplier for rank-mu update learning rate
-            "CMA_rankone":  1.0,  # multiplier for rank-one update learning rate
-            "popsize": 4,  # halves the default popsize
+            "popsize_factor": 0.15
         }
         self.es = cma.CMAEvolutionStrategy(self.nn.get_param(), SIGMA, opts)
         
@@ -102,6 +99,7 @@ class FullGlobalCMAnn:
                 if score > self.best_score:
                     self.best_score  = score
                     self.best_params = sol
+                    print(f"New best: {self.best_score:.2f} at step {self.global_steps}")
 
             # Need at least mu solutions to update the covariance matrix.
             if len(losses) < int(self.es.sp.weights.mu):
