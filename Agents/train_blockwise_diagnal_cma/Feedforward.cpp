@@ -56,7 +56,24 @@ class layer{
 
         std::vector<neuron> neurons;
 
-        layer(int size, int input_layer_dim) {
+        int block_size_per_layer; 
+
+        layer(int size, int input_layer_dim, int block_size_per_layer) {
+
+            if (size <= 0) {
+                throw std::invalid_argument("Layer size must be greater than 0.");
+            }
+
+            if (block_size_per_layer <= 0) {
+                throw std::invalid_argument("Block size per layer must be greater than 0.");
+            }
+
+            if (block_size_per_layer > size) {
+                throw std::invalid_argument("Block size per layer cannot be greater than the number of neurons in the layer.");
+            }
+            
+            this->block_size_per_layer = block_size_per_layer;
+
             for (int i = 0; i < size; i++) {
                 double bias = 0.0; 
                 std::vector<double> weights(input_layer_dim, 0.0);
@@ -64,12 +81,28 @@ class layer{
             }
         }
 
-        std::vector<neuron>* getNeurons() {
-            return &this->neurons; 
+        std::vector<std::vector<neuron>> getNeurons() {
+            std::vector<std::vector<neuron>> result;
+            int i = 0;
+            while (i < (int)this->neurons.size()) {
+                std::vector<neuron> b;
+                int g = i;
+                while (g < i + this->block_size_per_layer && g < (int)this->neurons.size()) {
+                    b.push_back(this->neurons[g]);
+                    g = g + 1;
+                }
+                i = i + this->block_size_per_layer;
+                if (!b.empty()) result.push_back(b);
+            }
+            return result; 
         }
 
-        size_t get_num_Neurons() {
+        size_t get_total_num_Neurons() {
             return this->neurons.size(); 
+        }
+
+        size_t get_num_Blocks() {
+            return (this->neurons.size()/ this->block_size_per_layer) + ((this->neurons.size() % this->block_size_per_layer) > 0 ? 1 : 0);
         }
 
 
@@ -88,18 +121,18 @@ class neural_network{
 
         std::vector<layer> layers;
 
-        neural_network(int input_size, const std::vector<int>& hidden_layer_sizes, int output_size) {
+        neural_network(int input_size, const std::vector<int>& hidden_layer_sizes, int output_size, int block_size_per_layer) {
 
             int prev_size = input_size;
             
             // Build hidden layers
             for (int size : hidden_layer_sizes) {
-                layers.push_back(layer(size, prev_size));
+                layers.push_back(layer(size, prev_size, block_size_per_layer));
                 prev_size = size;
             }
 
             // Build output layer
-            layers.push_back(layer(output_size, prev_size));
+            layers.push_back(layer(output_size, prev_size, block_size_per_layer));
 
         }
 
@@ -111,14 +144,12 @@ class neural_network{
             return this->layers.size(); 
         }
 
-        std::vector<double> get_param() {
-            std::vector<double> params;
+        std::vector<std::vector<neuron>> get_param() {
+            std::vector<std::vector<neuron>> params;
             for (layer& layer : this->layers) {
-                for (neuron& neuron : layer.neurons) {
-                    params.push_back(neuron.bias);
-                    for (double weight : neuron.weights) {
-                        params.push_back(weight);
-                    }
+                std::vector<std::vector<neuron>> blocks = layer.getNeurons();
+                for (std::vector<neuron>& block : blocks) {
+                    params.push_back(block);
                 }
             }
             return params;
