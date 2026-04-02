@@ -1,5 +1,0 @@
-env_name,total_timesteps,episodes_completed,mean_last_100,std_last_100,sigma,hidden_layers,seed,n_eval_episodes,deterministic_eval
-CartPole-v1,20000,260,111.11,100.79998958333279,0.5,32-32,,1,0
-CartPole-v1,50000,448,121.03,101.56568859610022,0.5,32-32,,1,0
-CartPole-v1,100000,843,181.44,116.14433434309227,0.5,32-32,,1,0
-CartPole-v1,500000,1589,374.27,162.25312662626874,0.5,32-32,,1,0

@@ -1,0 +1,43 @@
+[2026-03-26 04:01:32] Starting run_all.sh — 14 jobs total, max 4 concurrent.
+[2026-03-26 04:01:32] 🚀 STARTED  (job 1/14) [PID 4524]: python3 train_a2c.py Humanoid-v5 --total-timesteps 1000000 --num-runs 5
+[2026-03-26 04:01:32] 🚀 STARTED  (job 2/14) [PID 4526]: python3 train_ppo.py Humanoid-v5 --total-timesteps 1000000 --num-runs 5
+[2026-03-26 04:01:32] 🚀 STARTED  (job 3/14) [PID 4528]: python3 train_sac.py Humanoid-v5 --total-timesteps 1000000 --num-runs 5
+[2026-03-26 04:01:32] 🚀 STARTED  (job 4/14) [PID 4530]: python3 train_ddpg.py Humanoid-v5 --total-timesteps 1000000 --num-runs 5
+Training started ...
+Run 1/5 ...
+Saved episode log : ../output/Humanoid-v5/PPO/episode_log_run_1.csv
+Saved system log  : ../output/Humanoid-v5/PPO/system_log_run_1.csv
+Run 2/5 ...
+Saved episode log : ../output/Humanoid-v5/PPO/episode_log_run_2.csv
+Saved system log  : ../output/Humanoid-v5/PPO/system_log_run_2.csv
+Run 3/5 ...
+Saved episode log : ../output/Humanoid-v5/PPO/episode_log_run_3.csv
+Saved system log  : ../output/Humanoid-v5/PPO/system_log_run_3.csv
+Run 4/5 ...
+Saved episode log : ../output/Humanoid-v5/PPO/episode_log_run_4.csv
+Saved system log  : ../output/Humanoid-v5/PPO/system_log_run_4.csv
+Run 5/5 ...
+Saved episode log : ../output/Humanoid-v5/PPO/episode_log_run_5.csv
+Saved system log  : ../output/Humanoid-v5/PPO/system_log_run_5.csv
+Training complete!
+[2026-03-26 08:23:35] ✅ FINISHED (1/14) [PID 4526]: python3 train_ppo.py Humanoid-v5 --total-timesteps 1000000 --num-runs 5
+[2026-03-26 08:23:35] 🚀 STARTED  (job 5/14) [PID 46257]: python3 train_td3.py Humanoid-v5 --total-timesteps 1000000 --num-runs 5
+Training started ...
+Run 1/5 ...
+Saved episode log : ../output/Humanoid-v5/A2C/episode_log_run_1.csv
+Saved system log  : ../output/Humanoid-v5/A2C/system_log_run_1.csv
+Run 2/5 ...
+Saved episode log : ../output/Humanoid-v5/A2C/episode_log_run_2.csv
+Saved system log  : ../output/Humanoid-v5/A2C/system_log_run_2.csv
+Run 3/5 ...
+Saved episode log : ../output/Humanoid-v5/A2C/episode_log_run_3.csv
+Saved system log  : ../output/Humanoid-v5/A2C/system_log_run_3.csv
+Run 4/5 ...
+Saved episode log : ../output/Humanoid-v5/A2C/episode_log_run_4.csv
+Saved system log  : ../output/Humanoid-v5/A2C/system_log_run_4.csv
+Run 5/5 ...
+Saved episode log : ../output/Humanoid-v5/A2C/episode_log_run_5.csv
+Saved system log  : ../output/Humanoid-v5/A2C/system_log_run_5.csv
+Training complete!
+[2026-03-26 08:55:30] ✅ FINISHED (2/14) [PID 4524]: python3 train_a2c.py Humanoid-v5 --total-timesteps 1000000 --num-runs 5
+[2026-03-26 08:55:30] 🚀 STARTED  (job 6/14) [PID 51399]: python3 train_tqc.py Humanoid-v5 --total-timesteps 1000000 --num-runs 5
