@@ -1,6 +1,6 @@
-# DiagonalGlobalCMAnn.py
+# CMA_direct_policy_search.py
 # CMA-ES optimiser over the full parameter vector of a C++ neural network.
-# A single global CMA-ES instance optimises all network weights simultaneously using a diagonal covariance matrix.
+# A single global CMA-ES instance optimises all network weights simultaneously.
 #
 # Developed with assistance from:
 #   Claude  (Anthropic)  — https://www.anthropic.com
@@ -16,13 +16,13 @@ SIGMA = 0.05              # CMA-ES initial step size — pycma default
 
 
 # =============================================================================
-# DiagonalGlobalCMAnn
+# CMA_direct_policy_search
 # =============================================================================
 
-class DiagonalGlobalCMAnn:
+class CMA_direct_policy_search:
     """
     CMA-ES optimiser over the full flattened parameter vector of a C++ neural network.
-    A single CMA-ES instance maintains a diagonal covariance matrix over all weights simultaneously.
+    A single CMA-ES instance maintains a full covariance matrix over all weights simultaneously.
     Interface mirrors SB3: model.learn(total_timesteps, callback=callback)
     """
 
@@ -36,11 +36,10 @@ class DiagonalGlobalCMAnn:
         self.nn = nn.NeuralNetwork(obs_dim, list(HIDDEN_LAYERS), act_dim)
 
         # Initialise CMA-ES over the full flattened parameter vector.
-        
         opts = {
-            "CMA_diagonal": True,  # diagonal covariance matrix — linear memory scaling
-            "verbose":      -9,    # silence pycma console output
-            "popsize_factor": 0.5
+            "CMA_diagonal": 0,    # full covariance matrix — no diagonal approximation
+            "verbose":      -9,   # silence pycma console output
+            "popsize_factor": 0.15
         }
         self.es = cma.CMAEvolutionStrategy(self.nn.get_param(), SIGMA, opts)
         
@@ -50,8 +49,8 @@ class DiagonalGlobalCMAnn:
         self.best_score   = -np.inf
 
     def predict(self, obs):
-        """Forward pass through the network. Tanh output layer ensures actions are in (-1, 1),
-        which is valid for all MuJoCo and Box2D continuous control environments."""
+        """Forward pass through the network. Output layer — linear (no activation),
+        raw action values passed directly to the environment, which clips them to the action space bounds."""
         out = np.asarray(self.nn.forward(np.asarray(obs, dtype=np.float64).tolist()), dtype=np.float64)
         return out
 

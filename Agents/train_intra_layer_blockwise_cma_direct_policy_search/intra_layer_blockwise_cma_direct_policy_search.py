@@ -1,7 +1,6 @@
-# DiagonalBlockwiseCMAnn.py
+# FullBlockwiseCMAnn.py
 # CMA-ES optimiser over the full parameter vector of a C++ neural network.
 # One CMA-ES instance per block — each block covers a contiguous group of neurons within a layer.
-# Each block uses a diagonal covariance matrix (CMA_diagonal=True) for memory efficiency.
 # All blocks are asked for candidates, the full network is assembled and evaluated,
 # and the same fitness score is told to every block's CMA-ES instance.
 #
@@ -9,25 +8,26 @@
 #   Claude  (Anthropic)  — https://www.anthropic.com
 
 import numpy as np
+import math
 import cma
 import nn
 from BaseCallback import BaseCallback
 
 
 HIDDEN_LAYERS = (64, 64)  # Fixed architecture — matches SB3 MlpPolicy defaults for fair comparison.
-SIGMA         = 1     # CMA-ES initial step size — pycma default
+SIGMA         = 0.05      # CMA-ES initial step size — pycma default
 BLOCK_SIZE    = 1         # Default number of neurons per block
 
 
 # =============================================================================
-# DiagonalBlockwiseCMAnn
+# FullBlockwiseCMAnn
 # =============================================================================
 
-class DiagonalBlockwiseCMAnn:
+class FullBlockwiseCMAnn:
     """
     CMA-ES optimiser over the full parameter vector of a C++ neural network.
     The parameter vector is partitioned into blocks (groups of neurons within each layer).
-    Each block has its own CMA-ES instance with a diagonal covariance matrix.
+    Each block has its own CMA-ES instance with its own covariance matrix.
     All blocks are asked for a population of candidates each generation.
     The full network is assembled from one candidate per block, evaluated,
     and the same scalar fitness is told to every block's CMA-ES.
@@ -49,14 +49,15 @@ class DiagonalBlockwiseCMAnn:
         init_blocks   = self.nn.get_param()
         self.n_blocks = len(init_blocks)
 
-        # One CMA-ES instance per block — diagonal covariance for memory efficiency.
+        # One CMA-ES instance per block.
+        
         opts = {
-            "CMA_diagonal": True,  # diagonal covariance matrix — linear memory scaling
+            "CMA_diagonal": 0,
             "verbose":      -9,
             "CMA_mirrors":  0,
-            "popsize_factor": 2
+            "popsize_factor": 0.5
         }
-        self.es_list = [cma.CMAEvolutionStrategy(block, SIGMA, opts) for block in init_blocks]
+        self.es_list = [cma.CMAEvolutionStrategy(block, SIGMA, opts)for block in init_blocks]
 
         # Training state.
         self.global_steps = 0
@@ -135,7 +136,7 @@ class DiagonalBlockwiseCMAnn:
             # Step 4: tell the same losses to every block's CMA-ES.
             for b, es in enumerate(self.es_list):
                 sols_b = all_solutions[b][:len(losses)]
-                if len(losses) == popsize:  # only tell if full generation was evaluated
+                if len(losses) == popsize: # # only tell if full generation was evaluated
                     es.tell(sols_b, losses)
 
         # Load best found blocks into the network.
