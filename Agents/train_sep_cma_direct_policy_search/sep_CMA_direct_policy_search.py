@@ -21,7 +21,7 @@ SIGMA = 0.05              # CMA-ES initial step size — pycma default
 
 class sep_CMA_direct_policy_search:
     """
-    CMA-ES optimiser over the full flattened parameter vector of a C++ neural network.
+    sep-CMA-ES optimiser over the full flattened parameter vector of a C++ neural network.
     A single CMA-ES instance maintains a diagonal covariance matrix over all weights simultaneously.
     Interface mirrors SB3: model.learn(total_timesteps, callback=callback)
     """

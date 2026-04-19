@@ -1,17 +1,20 @@
 #!/usr/bin/env bash
 ########################################
 # run_all.sh
+# Launches all training runs across all environments and all agents.
 # Phase 1: Humanoid-v5 jobs, MAX_PARALLEL=1
-# Phase 2: All other jobs,   MAX_PARALLEL=4
-# Prints a message when each job starts
-# and when each job completes.
+# Phase 2: All other environments corresponding jobs,   MAX_PARALLEL=4
+# Prints a message when each job starts and when each job completes.
 #
 # CMA-ES variants live in their own subfolders and must be launched with cwd = the subfolder,
 # so each such command is wrapped in a subshell: (cd <folder> && python3 <script> ...)
+#
+# Developed with assistance from:
+#   Claude  (Anthropic)  — https://www.anthropic.com
 ########################################
 
 declare -a PIDS=()
-declare -A PID_CMD=()
+declare -a CMDS=()
 
 COMPLETED=0
 
@@ -22,23 +25,27 @@ log() {
 # ── helper: reap any finished child processes ────────────────────────────────
 reap_finished() {
   local new_pids=()
+  local new_cmds=()
+  local i=0
   for pid in "${PIDS[@]}"; do
     if kill -0 "$pid" 2>/dev/null; then
-      new_pids+=("$pid")          # still running
+      new_pids+=("$pid")
+      new_cmds+=("${CMDS[$i]}")
     else
       wait "$pid"
       EXIT_CODE=$?
-      CMD="${PID_CMD[$pid]}"
+      CMD="${CMDS[$i]}"
       COMPLETED=$((COMPLETED + 1))
       if [ $EXIT_CODE -eq 0 ]; then
         log "✅ FINISHED ($COMPLETED/$GRAND_TOTAL) [PID $pid]: $CMD"
       else
         log "❌ FAILED   ($COMPLETED/$GRAND_TOTAL) [PID $pid] (exit $EXIT_CODE): $CMD"
       fi
-      unset PID_CMD[$pid]
     fi
+    i=$((i + 1))
   done
   PIDS=("${new_pids[@]}")
+  CMDS=("${new_cmds[@]}")
 }
 
 # ── job queues ───────────────────────────────────────────────────────────────
@@ -136,7 +143,7 @@ for PHASE in 1 2; do
       bash -c "$CMD" &
       PID=$!
       PIDS+=("$PID")
-      PID_CMD[$PID]="$CMD"
+      CMDS+=("$CMD")
       log "🚀 STARTED  (job $NEXT/$TOTAL in phase $PHASE) [PID $PID]: $CMD"
     done
 

@@ -1,15 +1,15 @@
-# train_full_global_cma_nn.py
-# Trains FullGlobalCMAnn (Custom implementation using pycma) on a Gymnasium environment and logs per-episode returns/lengths
+# train_cma_direct_policy_search.py
+# Trains CMA_direct_policy_search (Custom implementation using pycma) on a Gymnasium environment and logs per-episode returns/lengths
 # and per-episode system metrics (wall time, CPU time, RAM, CPU%) to CSV files.
 #
-# Usage: python train_full_global_cma_nn.py <env_name> [--total-timesteps N] [--num-runs N]
+# Usage: python train_cma_direct_policy_search.py <env_name> [--total-timesteps N] [--num-runs N]
 #
 # Developed with assistance from:
 #   Claude  (Anthropic)  — https://www.anthropic.com
 
 import argparse, os, csv, time, psutil
 import gymnasium as gym
-from FullGlobalCMAnn import FullGlobalCMAnn
+from CMA_direct_policy_search import CMA_direct_policy_search
 from BaseCallback import BaseCallback
 
 
@@ -94,7 +94,7 @@ class EpisodeLoggerCallback(BaseCallback):
 def main():
 
     # --- command-line arguments ---
-    parser = argparse.ArgumentParser(description="Train FullGlobalCMAnn with full episode and system logging.")
+    parser = argparse.ArgumentParser(description="Train CMA_direct_policy_search with full episode and system logging.")
     parser.add_argument("env_name",          type=str,                  help="Gymnasium env ID, e.g. HalfCheetah-v5")
     parser.add_argument("--total-timesteps", type=int, default=100_000, help="Total env steps to train for (default: 100000)")
     parser.add_argument("--num-runs",        type=int, default=1,       help="Number of runs to average over (default: 1)")
@@ -104,7 +104,7 @@ def main():
     env = gym.make(args.env_name)
 
     # --- output directory ---
-    out_dir = os.path.join("..","..", "output", args.env_name, "FullGlobalCMAnn")
+    out_dir = os.path.join("..","..", "output", args.env_name, "CMA_direct_policy_search")
     os.makedirs(out_dir, exist_ok=True)  # creates full path, no error if already exists
 
     # --- create model and train ---
@@ -112,7 +112,7 @@ def main():
 
     for run in range(1, args.num_runs + 1):
         print(f"Run {run}/{args.num_runs} ...")
-        model  = FullGlobalCMAnn(env=env)
+        model  = CMA_direct_policy_search(env=env)
         logger = EpisodeLoggerCallback(out_dir, run)
         model.learn(total_timesteps=args.total_timesteps, callback=logger)
 
