@@ -1,0 +1,8 @@
+[2026-04-20 10:03:11] Starting run_all.sh — 12 jobs total (Phase 1: 12 x MAX_PARALLEL=4, Phase 2: 0 x MAX_PARALLEL=1).
+[2026-04-20 10:03:11] ▶ Starting Phase 1 — 12 jobs, max 4 concurrent.
+[2026-04-20 10:03:11] 🚀 STARTED  (job 1/12 in phase 1) [PID 617]: (cd train_cma_direct_policy_search && python3 train_cma_direct_policy_search.py Ant-v5 --total-timesteps 1000000 --num-runs 5)
+[2026-04-20 10:03:11] 🚀 STARTED  (job 2/12 in phase 1) [PID 621]: (cd train_sep_cma_direct_policy_search && python3 train_sep_cma_direct_policy_search.py Ant-v5 --total-timesteps 1000000 --num-runs 5)
+[2026-04-20 10:03:11] 🚀 STARTED  (job 3/12 in phase 1) [PID 626]: (cd train_intra_layer_blockwise_cma_direct_policy_search && python3 train_intra_layer_blockwise_cma_direct_policy_search.py Ant-v5 --total-timesteps 1000000 --num-runs 5)
+[2026-04-20 10:03:11] 🚀 STARTED  (job 4/12 in phase 1) [PID 630]: (cd train_cma_direct_policy_search && python3 train_cma_direct_policy_search.py HalfCheetah-v5 --total-timesteps 1000000 --num-runs 5)
+[2026-04-20 10:03:16] ❌ FAILED   (1/12) [PID 626] (exit 2): (cd train_intra_layer_blockwise_cma_direct_policy_search && python3 train_intra_layer_blockwise_cma_direct_policy_search.py Ant-v5 --total-timesteps 1000000 --num-runs 5)
+[2026-04-20 10:03:16] 🚀 STARTED  (job 5/12 in phase 1) [PID 680]: (cd train_sep_cma_direct_policy_search && python3 train_sep_cma_direct_policy_search.py HalfCheetah-v5 --total-timesteps 1000000 --num-runs 5)

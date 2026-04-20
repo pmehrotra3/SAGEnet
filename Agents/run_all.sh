@@ -2,8 +2,8 @@
 ########################################
 # run_all.sh
 # Launches all training runs across all environments and all agents.
-# Phase 1: Humanoid-v5 jobs, MAX_PARALLEL=1
-# Phase 2: All other environments corresponding jobs,   MAX_PARALLEL=4
+# Phase 1: All non-Humanoid environments associated jobs,  MAX_PARALLEL=4   (runs first)
+# Phase 2: Humanoid-v5 jobs,                               MAX_PARALLEL=1   (runs last)
 # Prints a message when each job starts and when each job completes.
 #
 # CMA-ES variants live in their own subfolders and must be launched with cwd = the subfolder,
@@ -50,21 +50,6 @@ reap_finished() {
 
 # ── job queues ───────────────────────────────────────────────────────────────
 COMMANDS_1=(
-  # HUMANOID-v5
-  #"python3 train_a2c.py Humanoid-v5 --total-timesteps 1000000 --num-runs 5"
-  #"python3 train_ppo.py Humanoid-v5 --total-timesteps 1000000 --num-runs 5"
-  #"python3 train_sac.py Humanoid-v5 --total-timesteps 1000000 --num-runs 5"
-  #"python3 train_ddpg.py Humanoid-v5 --total-timesteps 1000000 --num-runs 5"
-  #"python3 train_td3.py Humanoid-v5 --total-timesteps 1000000 --num-runs 5"
-  #"python3 train_tqc.py Humanoid-v5 --total-timesteps 1000000 --num-runs 5"
-  #"python3 train_trpo.py Humanoid-v5 --total-timesteps 1000000 --num-runs 5"
-  "(cd train_cma_direct_policy_search && python3 train_cma_direct_policy_search.py Humanoid-v5 --total-timesteps 1000000 --num-runs 5)"
-  "(cd train_sep_cma_direct_policy_search && python3 train_sep_cma_direct_policy_search.py Humanoid-v5 --total-timesteps 1000000 --num-runs 5)"
-  "(cd train_intra_layer_blockwise_cma_direct_policy_search && python3 train_intra_layer_blockwise_cma_direct_policy_search.py Humanoid-v5 --total-timesteps 1000000 --num-runs 5)"
-  #"(cd train_inter_layer_blockwise_cma_direct_policy_search && python3 train_inter_layer_blockwise_cma_direct_policy_search.py Humanoid-v5 --total-timesteps 1000000 --num-runs 5)"
-)
-
-COMMANDS_2=(
   # ANT-v5
   #"python3 train_a2c.py Ant-v5 --total-timesteps 1000000 --num-runs 5"
   #"python3 train_ppo.py Ant-v5 --total-timesteps 1000000 --num-runs 5"
@@ -118,15 +103,30 @@ COMMANDS_2=(
   #"(cd train_inter_layer_blockwise_cma_direct_policy_search && python3 train_inter_layer_blockwise_cma_direct_policy_search.py BipedalWalkerHardcore-v3 --total-timesteps 1000000 --num-runs 5)"
 )
 
+COMMANDS_2=(
+  # HUMANOID-v5
+  #"python3 train_a2c.py Humanoid-v5 --total-timesteps 1000000 --num-runs 5"
+  #"python3 train_ppo.py Humanoid-v5 --total-timesteps 1000000 --num-runs 5"
+  #"python3 train_sac.py Humanoid-v5 --total-timesteps 1000000 --num-runs 5"
+  #"python3 train_ddpg.py Humanoid-v5 --total-timesteps 1000000 --num-runs 5"
+  #"python3 train_td3.py Humanoid-v5 --total-timesteps 1000000 --num-runs 5"
+  #"python3 train_tqc.py Humanoid-v5 --total-timesteps 1000000 --num-runs 5"
+  #"python3 train_trpo.py Humanoid-v5 --total-timesteps 1000000 --num-runs 5"
+  #"(cd train_cma_direct_policy_search && python3 train_cma_direct_policy_search.py Humanoid-v5 --total-timesteps 1000000 --num-runs 5)"
+  #"(cd train_sep_cma_direct_policy_search && python3 train_sep_cma_direct_policy_search.py Humanoid-v5 --total-timesteps 1000000 --num-runs 5)"
+  #"(cd train_intra_layer_blockwise_cma_direct_policy_search && python3 train_intra_layer_blockwise_cma_direct_policy_search.py Humanoid-v5 --total-timesteps 1000000 --num-runs 5)"
+  #"(cd train_inter_layer_blockwise_cma_direct_policy_search && python3 train_inter_layer_blockwise_cma_direct_policy_search.py Humanoid-v5 --total-timesteps 1000000 --num-runs 5)"
+)
+
 GRAND_TOTAL=$(( ${#COMMANDS_1[@]} + ${#COMMANDS_2[@]} ))
-log "Starting run_all.sh — $GRAND_TOTAL jobs total (Phase 1: ${#COMMANDS_1[@]} x MAX_PARALLEL=1, Phase 2: ${#COMMANDS_2[@]} x MAX_PARALLEL=4)."
+log "Starting run_all.sh — $GRAND_TOTAL jobs total (Phase 1: ${#COMMANDS_1[@]} x MAX_PARALLEL=4, Phase 2: ${#COMMANDS_2[@]} x MAX_PARALLEL=1)."
 
 # ── main loop ────────────────────────────────────────────────────────────────
 for PHASE in 1 2; do
   if [ $PHASE -eq 1 ]; then
-    COMMANDS=("${COMMANDS_1[@]}"); MAX_PARALLEL=1
+    COMMANDS=("${COMMANDS_1[@]}"); MAX_PARALLEL=4
   else
-    COMMANDS=("${COMMANDS_2[@]}"); MAX_PARALLEL=4
+    COMMANDS=("${COMMANDS_2[@]}"); MAX_PARALLEL=1
   fi
 
   TOTAL=${#COMMANDS[@]}
