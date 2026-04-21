@@ -126,7 +126,6 @@ class intra_layer_blockwise_cma_direct_policy_search:
                 if score > self.best_score:
                     self.best_score  = score
                     self.best_blocks = [np.array(blk) for blk in blocks]
-                    print(f"New best: {self.best_score:.2f} at step {self.global_steps}")
 
             if len(losses) == 0:
                 break

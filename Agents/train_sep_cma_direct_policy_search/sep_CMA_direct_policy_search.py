@@ -40,7 +40,6 @@ class sep_CMA_direct_policy_search:
         opts = {
             "CMA_diagonal": True,  # diagonal covariance matrix enabled
             "verbose":      -9,    # silence pycma console output
-            "popsize_factor": 0.5
         }
         self.es = cma.CMAEvolutionStrategy(self.nn.get_param(), SIGMA, opts)
         
@@ -100,7 +99,6 @@ class sep_CMA_direct_policy_search:
                 if score > self.best_score:
                     self.best_score  = score
                     self.best_params = sol
-                    print(f"New best: {self.best_score:.2f} at step {self.global_steps}")
 
             # Need at least mu solutions to update the covariance matrix.
             if len(losses) < int(self.es.sp.weights.mu):

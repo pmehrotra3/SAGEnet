@@ -1,8 +1,234 @@
-[2026-04-20 10:03:11] Starting run_all.sh — 12 jobs total (Phase 1: 12 x MAX_PARALLEL=4, Phase 2: 0 x MAX_PARALLEL=1).
-[2026-04-20 10:03:11] ▶ Starting Phase 1 — 12 jobs, max 4 concurrent.
-[2026-04-20 10:03:11] 🚀 STARTED  (job 1/12 in phase 1) [PID 617]: (cd train_cma_direct_policy_search && python3 train_cma_direct_policy_search.py Ant-v5 --total-timesteps 1000000 --num-runs 5)
-[2026-04-20 10:03:11] 🚀 STARTED  (job 2/12 in phase 1) [PID 621]: (cd train_sep_cma_direct_policy_search && python3 train_sep_cma_direct_policy_search.py Ant-v5 --total-timesteps 1000000 --num-runs 5)
-[2026-04-20 10:03:11] 🚀 STARTED  (job 3/12 in phase 1) [PID 626]: (cd train_intra_layer_blockwise_cma_direct_policy_search && python3 train_intra_layer_blockwise_cma_direct_policy_search.py Ant-v5 --total-timesteps 1000000 --num-runs 5)
-[2026-04-20 10:03:11] 🚀 STARTED  (job 4/12 in phase 1) [PID 630]: (cd train_cma_direct_policy_search && python3 train_cma_direct_policy_search.py HalfCheetah-v5 --total-timesteps 1000000 --num-runs 5)
-[2026-04-20 10:03:16] ❌ FAILED   (1/12) [PID 626] (exit 2): (cd train_intra_layer_blockwise_cma_direct_policy_search && python3 train_intra_layer_blockwise_cma_direct_policy_search.py Ant-v5 --total-timesteps 1000000 --num-runs 5)
-[2026-04-20 10:03:16] 🚀 STARTED  (job 5/12 in phase 1) [PID 680]: (cd train_sep_cma_direct_policy_search && python3 train_sep_cma_direct_policy_search.py HalfCheetah-v5 --total-timesteps 1000000 --num-runs 5)
+[2026-04-20 11:19:52] Starting run_all.sh — 12 jobs total (Phase 1: 12 x MAX_PARALLEL=4, Phase 2: 0 x MAX_PARALLEL=1).
+[2026-04-20 11:19:52] ▶ Starting Phase 1 — 12 jobs, max 4 concurrent.
+[2026-04-20 11:19:52] 🚀 STARTED  (job 1/12 in phase 1) [PID 9454]: (cd train_cma_direct_policy_search && python3 train_cma_direct_policy_search.py Ant-v5 --total-timesteps 1000000 --num-runs 5)
+[2026-04-20 11:19:52] 🚀 STARTED  (job 2/12 in phase 1) [PID 9458]: (cd train_sep_cma_direct_policy_search && python3 train_sep_cma_direct_policy_search.py Ant-v5 --total-timesteps 1000000 --num-runs 5)
+[2026-04-20 11:19:52] 🚀 STARTED  (job 3/12 in phase 1) [PID 9462]: (cd train_intra_layer_blockwise_cma_direct_policy_search && python3 train_intra_layer_blockwise_cma_direct_policy_search.py Ant-v5 --total-timesteps 1000000 --num-runs 5)
+[2026-04-20 11:19:52] 🚀 STARTED  (job 4/12 in phase 1) [PID 9466]: (cd train_cma_direct_policy_search && python3 train_cma_direct_policy_search.py HalfCheetah-v5 --total-timesteps 1000000 --num-runs 5)
+Training started ...
+Run 1/5 ...
+Saved episode log : ../../output/HalfCheetah-v5/CMA_direct_policy_search/episode_log_run_1.csv
+Saved system log  : ../../output/HalfCheetah-v5/CMA_direct_policy_search/system_log_run_1.csv
+Run 2/5 ...
+Saved episode log : ../../output/HalfCheetah-v5/CMA_direct_policy_search/episode_log_run_2.csv
+Saved system log  : ../../output/HalfCheetah-v5/CMA_direct_policy_search/system_log_run_2.csv
+Run 3/5 ...
+Saved episode log : ../../output/HalfCheetah-v5/CMA_direct_policy_search/episode_log_run_3.csv
+Saved system log  : ../../output/HalfCheetah-v5/CMA_direct_policy_search/system_log_run_3.csv
+Run 4/5 ...
+Saved episode log : ../../output/HalfCheetah-v5/CMA_direct_policy_search/episode_log_run_4.csv
+Saved system log  : ../../output/HalfCheetah-v5/CMA_direct_policy_search/system_log_run_4.csv
+Run 5/5 ...
+Saved episode log : ../../output/HalfCheetah-v5/CMA_direct_policy_search/episode_log_run_5.csv
+Saved system log  : ../../output/HalfCheetah-v5/CMA_direct_policy_search/system_log_run_5.csv
+Training complete!
+[2026-04-20 11:22:33] ✅ FINISHED (1/12) [PID 9466]: (cd train_cma_direct_policy_search && python3 train_cma_direct_policy_search.py HalfCheetah-v5 --total-timesteps 1000000 --num-runs 5)
+[2026-04-20 11:22:33] 🚀 STARTED  (job 5/12 in phase 1) [PID 9586]: (cd train_sep_cma_direct_policy_search && python3 train_sep_cma_direct_policy_search.py HalfCheetah-v5 --total-timesteps 1000000 --num-runs 5)
+Training started ...
+Run 1/5 ...
+Saved episode log : ../../output/HalfCheetah-v5/sep_CMA_direct_policy_search/episode_log_run_1.csv
+Saved system log  : ../../output/HalfCheetah-v5/sep_CMA_direct_policy_search/system_log_run_1.csv
+Run 2/5 ...
+Saved episode log : ../../output/HalfCheetah-v5/sep_CMA_direct_policy_search/episode_log_run_2.csv
+Saved system log  : ../../output/HalfCheetah-v5/sep_CMA_direct_policy_search/system_log_run_2.csv
+Run 3/5 ...
+Saved episode log : ../../output/HalfCheetah-v5/sep_CMA_direct_policy_search/episode_log_run_3.csv
+Saved system log  : ../../output/HalfCheetah-v5/sep_CMA_direct_policy_search/system_log_run_3.csv
+Run 4/5 ...
+Saved episode log : ../../output/HalfCheetah-v5/sep_CMA_direct_policy_search/episode_log_run_4.csv
+Saved system log  : ../../output/HalfCheetah-v5/sep_CMA_direct_policy_search/system_log_run_4.csv
+Run 5/5 ...
+Saved episode log : ../../output/HalfCheetah-v5/sep_CMA_direct_policy_search/episode_log_run_5.csv
+Saved system log  : ../../output/HalfCheetah-v5/sep_CMA_direct_policy_search/system_log_run_5.csv
+Training complete!
+[2026-04-20 11:24:58] ✅ FINISHED (2/12) [PID 9586]: (cd train_sep_cma_direct_policy_search && python3 train_sep_cma_direct_policy_search.py HalfCheetah-v5 --total-timesteps 1000000 --num-runs 5)
+[2026-04-20 11:24:58] 🚀 STARTED  (job 6/12 in phase 1) [PID 9678]: (cd train_intra_layer_blockwise_cma_direct_policy_search && python3 train_intra_layer_blockwise_cma_direct_policy_search.py HalfCheetah-v5 --total-timesteps 1000000 --num-runs 5)
+Training started ...
+Run 1/5 ...
+Saved episode log : ../../output/HalfCheetah-v5/intra_layer_blockwise_cma_direct_policy_search/episode_log_run_1.csv
+Saved system log  : ../../output/HalfCheetah-v5/intra_layer_blockwise_cma_direct_policy_search/system_log_run_1.csv
+Run 2/5 ...
+Saved episode log : ../../output/HalfCheetah-v5/intra_layer_blockwise_cma_direct_policy_search/episode_log_run_2.csv
+Saved system log  : ../../output/HalfCheetah-v5/intra_layer_blockwise_cma_direct_policy_search/system_log_run_2.csv
+Run 3/5 ...
+Saved episode log : ../../output/HalfCheetah-v5/intra_layer_blockwise_cma_direct_policy_search/episode_log_run_3.csv
+Saved system log  : ../../output/HalfCheetah-v5/intra_layer_blockwise_cma_direct_policy_search/system_log_run_3.csv
+Run 4/5 ...
+Saved episode log : ../../output/HalfCheetah-v5/intra_layer_blockwise_cma_direct_policy_search/episode_log_run_4.csv
+Saved system log  : ../../output/HalfCheetah-v5/intra_layer_blockwise_cma_direct_policy_search/system_log_run_4.csv
+Run 5/5 ...
+Saved episode log : ../../output/HalfCheetah-v5/intra_layer_blockwise_cma_direct_policy_search/episode_log_run_5.csv
+Saved system log  : ../../output/HalfCheetah-v5/intra_layer_blockwise_cma_direct_policy_search/system_log_run_5.csv
+Training complete!
+[2026-04-20 11:27:28] ✅ FINISHED (3/12) [PID 9678]: (cd train_intra_layer_blockwise_cma_direct_policy_search && python3 train_intra_layer_blockwise_cma_direct_policy_search.py HalfCheetah-v5 --total-timesteps 1000000 --num-runs 5)
+[2026-04-20 11:27:28] 🚀 STARTED  (job 7/12 in phase 1) [PID 9773]: (cd train_cma_direct_policy_search && python3 train_cma_direct_policy_search.py Walker2d-v5 --total-timesteps 1000000 --num-runs 5)
+Training started ...
+Run 1/5 ...
+Saved episode log : ../../output/Ant-v5/sep_CMA_direct_policy_search/episode_log_run_1.csv
+Saved system log  : ../../output/Ant-v5/sep_CMA_direct_policy_search/system_log_run_1.csv
+Run 2/5 ...
+Saved episode log : ../../output/Ant-v5/sep_CMA_direct_policy_search/episode_log_run_2.csv
+Saved system log  : ../../output/Ant-v5/sep_CMA_direct_policy_search/system_log_run_2.csv
+Run 3/5 ...
+Saved episode log : ../../output/Ant-v5/sep_CMA_direct_policy_search/episode_log_run_3.csv
+Saved system log  : ../../output/Ant-v5/sep_CMA_direct_policy_search/system_log_run_3.csv
+Run 4/5 ...
+Saved episode log : ../../output/Ant-v5/sep_CMA_direct_policy_search/episode_log_run_4.csv
+Saved system log  : ../../output/Ant-v5/sep_CMA_direct_policy_search/system_log_run_4.csv
+Run 5/5 ...
+Saved episode log : ../../output/Ant-v5/sep_CMA_direct_policy_search/episode_log_run_5.csv
+Saved system log  : ../../output/Ant-v5/sep_CMA_direct_policy_search/system_log_run_5.csv
+Training complete!
+[2026-04-20 11:33:24] ✅ FINISHED (4/12) [PID 9458]: (cd train_sep_cma_direct_policy_search && python3 train_sep_cma_direct_policy_search.py Ant-v5 --total-timesteps 1000000 --num-runs 5)
+[2026-04-20 11:33:24] 🚀 STARTED  (job 8/12 in phase 1) [PID 10086]: (cd train_sep_cma_direct_policy_search && python3 train_sep_cma_direct_policy_search.py Walker2d-v5 --total-timesteps 1000000 --num-runs 5)
+Training started ...
+Run 1/5 ...
+Saved episode log : ../../output/Ant-v5/CMA_direct_policy_search/episode_log_run_1.csv
+Saved system log  : ../../output/Ant-v5/CMA_direct_policy_search/system_log_run_1.csv
+Run 2/5 ...
+Saved episode log : ../../output/Ant-v5/CMA_direct_policy_search/episode_log_run_2.csv
+Saved system log  : ../../output/Ant-v5/CMA_direct_policy_search/system_log_run_2.csv
+Run 3/5 ...
+Saved episode log : ../../output/Ant-v5/CMA_direct_policy_search/episode_log_run_3.csv
+Saved system log  : ../../output/Ant-v5/CMA_direct_policy_search/system_log_run_3.csv
+Run 4/5 ...
+Saved episode log : ../../output/Ant-v5/CMA_direct_policy_search/episode_log_run_4.csv
+Saved system log  : ../../output/Ant-v5/CMA_direct_policy_search/system_log_run_4.csv
+Run 5/5 ...
+Saved episode log : ../../output/Ant-v5/CMA_direct_policy_search/episode_log_run_5.csv
+Saved system log  : ../../output/Ant-v5/CMA_direct_policy_search/system_log_run_5.csv
+Training complete!
+[2026-04-20 11:34:19] ✅ FINISHED (5/12) [PID 9454]: (cd train_cma_direct_policy_search && python3 train_cma_direct_policy_search.py Ant-v5 --total-timesteps 1000000 --num-runs 5)
+[2026-04-20 11:34:19] 🚀 STARTED  (job 9/12 in phase 1) [PID 10178]: (cd train_intra_layer_blockwise_cma_direct_policy_search && python3 train_intra_layer_blockwise_cma_direct_policy_search.py Walker2d-v5 --total-timesteps 1000000 --num-runs 5)
+Training started ...
+Run 1/5 ...
+Saved episode log : ../../output/Walker2d-v5/CMA_direct_policy_search/episode_log_run_1.csv
+Saved system log  : ../../output/Walker2d-v5/CMA_direct_policy_search/system_log_run_1.csv
+Run 2/5 ...
+Saved episode log : ../../output/Walker2d-v5/CMA_direct_policy_search/episode_log_run_2.csv
+Saved system log  : ../../output/Walker2d-v5/CMA_direct_policy_search/system_log_run_2.csv
+Run 3/5 ...
+Saved episode log : ../../output/Walker2d-v5/CMA_direct_policy_search/episode_log_run_3.csv
+Saved system log  : ../../output/Walker2d-v5/CMA_direct_policy_search/system_log_run_3.csv
+Run 4/5 ...
+Saved episode log : ../../output/Walker2d-v5/CMA_direct_policy_search/episode_log_run_4.csv
+Saved system log  : ../../output/Walker2d-v5/CMA_direct_policy_search/system_log_run_4.csv
+Run 5/5 ...
+Saved episode log : ../../output/Walker2d-v5/CMA_direct_policy_search/episode_log_run_5.csv
+Saved system log  : ../../output/Walker2d-v5/CMA_direct_policy_search/system_log_run_5.csv
+Training complete!
+[2026-04-20 11:37:09] ✅ FINISHED (6/12) [PID 9773]: (cd train_cma_direct_policy_search && python3 train_cma_direct_policy_search.py Walker2d-v5 --total-timesteps 1000000 --num-runs 5)
+[2026-04-20 11:37:09] 🚀 STARTED  (job 10/12 in phase 1) [PID 10285]: (cd train_cma_direct_policy_search && python3 train_cma_direct_policy_search.py BipedalWalkerHardcore-v3 --total-timesteps 1000000 --num-runs 5)
+Training started ...
+Run 1/5 ...
+Saved episode log : ../../output/Ant-v5/intra_layer_blockwise_cma_direct_policy_search/episode_log_run_1.csv
+Saved system log  : ../../output/Ant-v5/intra_layer_blockwise_cma_direct_policy_search/system_log_run_1.csv
+Run 2/5 ...
+Saved episode log : ../../output/Ant-v5/intra_layer_blockwise_cma_direct_policy_search/episode_log_run_2.csv
+Saved system log  : ../../output/Ant-v5/intra_layer_blockwise_cma_direct_policy_search/system_log_run_2.csv
+Run 3/5 ...
+Saved episode log : ../../output/Ant-v5/intra_layer_blockwise_cma_direct_policy_search/episode_log_run_3.csv
+Saved system log  : ../../output/Ant-v5/intra_layer_blockwise_cma_direct_policy_search/system_log_run_3.csv
+Run 4/5 ...
+Saved episode log : ../../output/Ant-v5/intra_layer_blockwise_cma_direct_policy_search/episode_log_run_4.csv
+Saved system log  : ../../output/Ant-v5/intra_layer_blockwise_cma_direct_policy_search/system_log_run_4.csv
+Run 5/5 ...
+Saved episode log : ../../output/Ant-v5/intra_layer_blockwise_cma_direct_policy_search/episode_log_run_5.csv
+Saved system log  : ../../output/Ant-v5/intra_layer_blockwise_cma_direct_policy_search/system_log_run_5.csv
+Training complete!
+[2026-04-20 11:39:39] ✅ FINISHED (7/12) [PID 9462]: (cd train_intra_layer_blockwise_cma_direct_policy_search && python3 train_intra_layer_blockwise_cma_direct_policy_search.py Ant-v5 --total-timesteps 1000000 --num-runs 5)
+[2026-04-20 11:39:39] 🚀 STARTED  (job 11/12 in phase 1) [PID 10404]: (cd train_sep_cma_direct_policy_search && python3 train_sep_cma_direct_policy_search.py BipedalWalkerHardcore-v3 --total-timesteps 1000000 --num-runs 5)
+Training started ...
+Run 1/5 ...
+Saved episode log : ../../output/Walker2d-v5/sep_CMA_direct_policy_search/episode_log_run_1.csv
+Saved system log  : ../../output/Walker2d-v5/sep_CMA_direct_policy_search/system_log_run_1.csv
+Run 2/5 ...
+Saved episode log : ../../output/Walker2d-v5/sep_CMA_direct_policy_search/episode_log_run_2.csv
+Saved system log  : ../../output/Walker2d-v5/sep_CMA_direct_policy_search/system_log_run_2.csv
+Run 3/5 ...
+Saved episode log : ../../output/Walker2d-v5/sep_CMA_direct_policy_search/episode_log_run_3.csv
+Saved system log  : ../../output/Walker2d-v5/sep_CMA_direct_policy_search/system_log_run_3.csv
+Run 4/5 ...
+Saved episode log : ../../output/Walker2d-v5/sep_CMA_direct_policy_search/episode_log_run_4.csv
+Saved system log  : ../../output/Walker2d-v5/sep_CMA_direct_policy_search/system_log_run_4.csv
+Run 5/5 ...
+Saved episode log : ../../output/Walker2d-v5/sep_CMA_direct_policy_search/episode_log_run_5.csv
+Saved system log  : ../../output/Walker2d-v5/sep_CMA_direct_policy_search/system_log_run_5.csv
+Training complete!
+[2026-04-20 11:39:44] ✅ FINISHED (8/12) [PID 10086]: (cd train_sep_cma_direct_policy_search && python3 train_sep_cma_direct_policy_search.py Walker2d-v5 --total-timesteps 1000000 --num-runs 5)
+[2026-04-20 11:39:44] 🚀 STARTED  (job 12/12 in phase 1) [PID 10414]: (cd train_intra_layer_blockwise_cma_direct_policy_search && python3 train_intra_layer_blockwise_cma_direct_policy_search.py BipedalWalkerHardcore-v3 --total-timesteps 1000000 --num-runs 5)
+Training started ...
+Run 1/5 ...
+Saved episode log : ../../output/Walker2d-v5/intra_layer_blockwise_cma_direct_policy_search/episode_log_run_1.csv
+Saved system log  : ../../output/Walker2d-v5/intra_layer_blockwise_cma_direct_policy_search/system_log_run_1.csv
+Run 2/5 ...
+Saved episode log : ../../output/Walker2d-v5/intra_layer_blockwise_cma_direct_policy_search/episode_log_run_2.csv
+Saved system log  : ../../output/Walker2d-v5/intra_layer_blockwise_cma_direct_policy_search/system_log_run_2.csv
+Run 3/5 ...
+Saved episode log : ../../output/Walker2d-v5/intra_layer_blockwise_cma_direct_policy_search/episode_log_run_3.csv
+Saved system log  : ../../output/Walker2d-v5/intra_layer_blockwise_cma_direct_policy_search/system_log_run_3.csv
+Run 4/5 ...
+Saved episode log : ../../output/Walker2d-v5/intra_layer_blockwise_cma_direct_policy_search/episode_log_run_4.csv
+Saved system log  : ../../output/Walker2d-v5/intra_layer_blockwise_cma_direct_policy_search/system_log_run_4.csv
+Run 5/5 ...
+Saved episode log : ../../output/Walker2d-v5/intra_layer_blockwise_cma_direct_policy_search/episode_log_run_5.csv
+Saved system log  : ../../output/Walker2d-v5/intra_layer_blockwise_cma_direct_policy_search/system_log_run_5.csv
+Training complete!
+[2026-04-20 11:41:19] ✅ FINISHED (9/12) [PID 10178]: (cd train_intra_layer_blockwise_cma_direct_policy_search && python3 train_intra_layer_blockwise_cma_direct_policy_search.py Walker2d-v5 --total-timesteps 1000000 --num-runs 5)
+Training started ...
+Run 1/5 ...
+Saved episode log : ../../output/BipedalWalkerHardcore-v3/CMA_direct_policy_search/episode_log_run_1.csv
+Saved system log  : ../../output/BipedalWalkerHardcore-v3/CMA_direct_policy_search/system_log_run_1.csv
+Run 2/5 ...
+Saved episode log : ../../output/BipedalWalkerHardcore-v3/CMA_direct_policy_search/episode_log_run_2.csv
+Saved system log  : ../../output/BipedalWalkerHardcore-v3/CMA_direct_policy_search/system_log_run_2.csv
+Run 3/5 ...
+Saved episode log : ../../output/BipedalWalkerHardcore-v3/CMA_direct_policy_search/episode_log_run_3.csv
+Saved system log  : ../../output/BipedalWalkerHardcore-v3/CMA_direct_policy_search/system_log_run_3.csv
+Run 4/5 ...
+Saved episode log : ../../output/BipedalWalkerHardcore-v3/CMA_direct_policy_search/episode_log_run_4.csv
+Saved system log  : ../../output/BipedalWalkerHardcore-v3/CMA_direct_policy_search/system_log_run_4.csv
+Run 5/5 ...
+Saved episode log : ../../output/BipedalWalkerHardcore-v3/CMA_direct_policy_search/episode_log_run_5.csv
+Saved system log  : ../../output/BipedalWalkerHardcore-v3/CMA_direct_policy_search/system_log_run_5.csv
+Training complete!
+[2026-04-20 11:43:30] ✅ FINISHED (10/12) [PID 10285]: (cd train_cma_direct_policy_search && python3 train_cma_direct_policy_search.py BipedalWalkerHardcore-v3 --total-timesteps 1000000 --num-runs 5)
+Training started ...
+Run 1/5 ...
+Saved episode log : ../../output/BipedalWalkerHardcore-v3/sep_CMA_direct_policy_search/episode_log_run_1.csv
+Saved system log  : ../../output/BipedalWalkerHardcore-v3/sep_CMA_direct_policy_search/system_log_run_1.csv
+Run 2/5 ...
+Saved episode log : ../../output/BipedalWalkerHardcore-v3/sep_CMA_direct_policy_search/episode_log_run_2.csv
+Saved system log  : ../../output/BipedalWalkerHardcore-v3/sep_CMA_direct_policy_search/system_log_run_2.csv
+Run 3/5 ...
+Saved episode log : ../../output/BipedalWalkerHardcore-v3/sep_CMA_direct_policy_search/episode_log_run_3.csv
+Saved system log  : ../../output/BipedalWalkerHardcore-v3/sep_CMA_direct_policy_search/system_log_run_3.csv
+Run 4/5 ...
+Saved episode log : ../../output/BipedalWalkerHardcore-v3/sep_CMA_direct_policy_search/episode_log_run_4.csv
+Saved system log  : ../../output/BipedalWalkerHardcore-v3/sep_CMA_direct_policy_search/system_log_run_4.csv
+Run 5/5 ...
+Saved episode log : ../../output/BipedalWalkerHardcore-v3/sep_CMA_direct_policy_search/episode_log_run_5.csv
+Saved system log  : ../../output/BipedalWalkerHardcore-v3/sep_CMA_direct_policy_search/system_log_run_5.csv
+Training complete!
+Training started ...
+Run 1/5 ...
+Saved episode log : ../../output/BipedalWalkerHardcore-v3/intra_layer_blockwise_cma_direct_policy_search/episode_log_run_1.csv
+Saved system log  : ../../output/BipedalWalkerHardcore-v3/intra_layer_blockwise_cma_direct_policy_search/system_log_run_1.csv
+Run 2/5 ...
+Saved episode log : ../../output/BipedalWalkerHardcore-v3/intra_layer_blockwise_cma_direct_policy_search/episode_log_run_2.csv
+Saved system log  : ../../output/BipedalWalkerHardcore-v3/intra_layer_blockwise_cma_direct_policy_search/system_log_run_2.csv
+Run 3/5 ...
+Saved episode log : ../../output/BipedalWalkerHardcore-v3/intra_layer_blockwise_cma_direct_policy_search/episode_log_run_3.csv
+Saved system log  : ../../output/BipedalWalkerHardcore-v3/intra_layer_blockwise_cma_direct_policy_search/system_log_run_3.csv
+Run 4/5 ...
+Saved episode log : ../../output/BipedalWalkerHardcore-v3/intra_layer_blockwise_cma_direct_policy_search/episode_log_run_4.csv
+Saved system log  : ../../output/BipedalWalkerHardcore-v3/intra_layer_blockwise_cma_direct_policy_search/system_log_run_4.csv
+Run 5/5 ...
+Saved episode log : ../../output/BipedalWalkerHardcore-v3/intra_layer_blockwise_cma_direct_policy_search/episode_log_run_5.csv
+Saved system log  : ../../output/BipedalWalkerHardcore-v3/intra_layer_blockwise_cma_direct_policy_search/system_log_run_5.csv
+Training complete!
+[2026-04-20 11:45:35] ✅ FINISHED (11/12) [PID 10404]: (cd train_sep_cma_direct_policy_search && python3 train_sep_cma_direct_policy_search.py BipedalWalkerHardcore-v3 --total-timesteps 1000000 --num-runs 5)
+[2026-04-20 11:45:35] ✅ FINISHED (12/12) [PID 10414]: (cd train_intra_layer_blockwise_cma_direct_policy_search && python3 train_intra_layer_blockwise_cma_direct_policy_search.py BipedalWalkerHardcore-v3 --total-timesteps 1000000 --num-runs 5)
+[2026-04-20 11:45:35] ✔ Phase 1 complete.
+[2026-04-20 11:45:35] ▶ Starting Phase 2 — 0 jobs, max 1 concurrent.
+[2026-04-20 11:45:35] ✔ Phase 2 complete.
+[2026-04-20 11:45:35] 🏁 All 12 jobs completed.

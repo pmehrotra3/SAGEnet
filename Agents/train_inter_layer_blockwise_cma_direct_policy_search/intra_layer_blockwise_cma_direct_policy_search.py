@@ -54,8 +54,6 @@ class FullBlockwiseCMAnn:
         opts = {
             "CMA_diagonal": 0,
             "verbose":      -9,
-            "CMA_mirrors":  0,
-            "popsize_factor": 0.5
         }
         self.es_list = [cma.CMAEvolutionStrategy(block, SIGMA, opts)for block in init_blocks]
 
@@ -128,7 +126,6 @@ class FullBlockwiseCMAnn:
                 if score > self.best_score:
                     self.best_score  = score
                     self.best_blocks = [np.array(blk) for blk in blocks]
-                    print(f"New best: {self.best_score:.2f} at step {self.global_steps}")
 
             if len(losses) == 0:
                 break
