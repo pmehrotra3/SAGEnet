@@ -39,6 +39,7 @@ class CMA_direct_policy_search:
         opts = {
             "CMA_diagonal": 0,    # full covariance matrix — no diagonal approximation
             "verbose":      -9,   # silence pycma console output
+            "popsize_factor": 0.5
         }
         self.es = cma.CMAEvolutionStrategy(self.nn.get_param(), SIGMA, opts)
         
